@@ -20,7 +20,12 @@
       displayCanvas : function (canvas){
         canvas.id = 'myCanvas';
         const canvasDivElement = document.getElementById('canvas-holder');
-        canvasDivElement.appendChild(canvas);
+        const existingCanvas = canvasDivElement.firstChild;
+        if(existingCanvas == null){
+          canvasDivElement.appendChild( canvas );
+        } else {
+          canvasDivElement.replaceChild(canvas, existingCanvas);
+        }
       },
       sizeX : 100,
       sizeY : 100,
