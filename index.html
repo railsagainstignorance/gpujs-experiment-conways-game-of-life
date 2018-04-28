@@ -5,12 +5,23 @@
   <meta charset="utf-8">
   <title>GPU.js Experiment</title>
   <script src="includes/vendor/gpu.js"></script>
+  <script src="includes/gameOfLife.js"></script>
   <link rel="stylesheet" type="text/css" href="includes/basic.css">
 </head>
 <body>
   <h1>GPU.js Experiment</h1>
 
   <div id="canvas-holder"></div>
+
+  <script>
+  (function(){
+    GOL.create({
+      gpu : new GPU(),
+      canvasDivId : 'canvas-holder',
+      canvasId : 'myCanvas',
+    });
+  })();
+  </script>
 
 </body>
 </html>
