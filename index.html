@@ -17,8 +17,11 @@
   (function(){
     GOL.create({
       gpu : new GPU(),
-      canvasDivId : 'canvas-holder',
-      canvasId : 'myCanvas',
+      displayCanvas : function (canvas){
+        canvas.id = 'myCanvas';
+        const canvasDivElement = document.getElementById('canvas-holder');
+        canvasDivElement.appendChild(canvas);
+      }
     });
   })();
   </script>

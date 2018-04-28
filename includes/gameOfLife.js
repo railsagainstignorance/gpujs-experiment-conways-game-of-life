@@ -4,7 +4,7 @@ const GOL = (function(){
     const gpu = config.gpu;
 
     const render = gpu.createKernel(function() {
-        this.color(50, 0, 50, 1);
+        this.color(50 * (this.thread.x % 3), 50 * (this.thread.y % 4), 50, 1);
     })
       .setOutput([20, 20])
       .setGraphical(true);
@@ -12,8 +12,7 @@ const GOL = (function(){
     render();
 
     const canvas = render.getCanvas();
-    canvas.id = config.canvasId;
-    document.getElementById(config.canvasDivId).appendChild(canvas);
+    config.displayCanvas( canvas );
   }
 
 return {
