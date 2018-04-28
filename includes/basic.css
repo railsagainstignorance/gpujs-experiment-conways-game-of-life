@@ -9,8 +9,8 @@ html {
   background-color: white;
 }
 #myCanvas { // make them canvas pixels bigger. Assuming the canvas is 100x100, the pixels become 4x4
-  width: 40vh;
-  height: 40vh;
+  width: 80vh;
+  height: 80vh;
 }
 .remove {
   display:none;
