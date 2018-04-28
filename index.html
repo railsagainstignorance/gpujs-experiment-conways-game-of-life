@@ -11,22 +11,14 @@
 <body>
   <h1>GPU.js Experiment</h1>
 
-  <div id="canvas-holder"></div>
+  <div id="canvas-holder">
+    <canvas class="blotting-paper" id="myCanvas" width="100" height="100"></canvas>
+  </div>
 
   <script>
   (function(){
     GOL.create({
-      gpu : new GPU(),
-      displayCanvas : function (canvas){
-        canvas.id = 'myCanvas';
-        const canvasDivElement = document.getElementById('canvas-holder');
-        const existingCanvas = canvasDivElement.firstChild;
-        if(existingCanvas == null){
-          canvasDivElement.appendChild( canvas );
-        } else {
-          canvasDivElement.replaceChild(canvas, existingCanvas);
-        }
-      },
+      gpu : new GPU({ canvas : document.getElementById('myCanvas') }),
       sizeX : 100,
       sizeY : 100,
     });

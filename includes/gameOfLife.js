@@ -22,8 +22,8 @@ const GOL = (function(){
     // const grid = initGrid();
     // render(grid);
 
-    const canvas = render.getCanvas();
-    config.displayCanvas( canvas );
+    // const canvas = render.getCanvas();
+    // config.displayCanvas( canvas );
   }
 
 return {
