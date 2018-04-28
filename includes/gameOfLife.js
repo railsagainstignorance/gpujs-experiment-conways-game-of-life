@@ -6,11 +6,10 @@ const GOL = (function(){
     const render = gpu.createKernel(function() {
         this.color(50 * (this.thread.x % 3), 50 * (this.thread.y % 4), 50, 1);
     })
-      .setOutput([20, 20])
+      .setOutput([config.sizeX, config.sizeY])
       .setGraphical(true);
 
     render();
-
     const canvas = render.getCanvas();
     config.displayCanvas( canvas );
   }
