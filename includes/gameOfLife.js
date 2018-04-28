@@ -13,14 +13,14 @@ const GOL = (function(){
       .setOutput([config.sizeX, config.sizeY])
       .setGraphical(true);
 
-    // const initAndRender = gpu.combineKernels(initGrid, render, function() {
-	  //    return render(initGrid());
-    //  });
-    //
-    // initAndRender();
+    const initAndRender = gpu.combineKernels(initGrid, render, function() {
+	     return render(initGrid());
+     });
 
-    const grid = initGrid();
-    render(grid);
+    initAndRender();
+
+    // const grid = initGrid();
+    // render(grid);
 
     const canvas = render.getCanvas();
     config.displayCanvas( canvas );
