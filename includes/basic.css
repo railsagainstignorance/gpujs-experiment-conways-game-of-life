@@ -1,0 +1,20 @@
+html {
+  font-family: sans-serif;
+}
+.blotting-paper {
+  border-width: 1px;
+  border-color: lightgrey;
+  border-style: solid;
+  box-shadow: 10px 10px 5px #888888;
+  background-color: white;
+}
+#myCanvas { // make them canvas pixels bigger. Assuming the canvas is 100x100, the pixels become 4x4
+  width: 90vh;
+  height: 90vh;
+}
+.remove {
+  display:none;
+}
+#configparams form table td {
+  border: 1px solid lightgrey;
+}
