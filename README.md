@@ -1,6 +1,8 @@
 # Experimenting with GPU.js
 ## via Conway's Game of Life, hopefully getting to the chromatography project
 
+It works! [Feel the demo](https://railsagainstignorance.github.io/gpujs-experiment-conways-game-of-life/index.html).
+
 ## usage
 
 Serve the static files as a web page, point your browser at localhost:YOURPORT, and watch something happen.
