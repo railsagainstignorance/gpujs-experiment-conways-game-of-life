@@ -21,7 +21,9 @@ const GOL = (function(){
         return a[this.thread.x][this.thread.y];
     }
 
-    const loadGridK = gpu.createKernel(loadGridKFn).setOutput([config.sizeX, config.sizeY])
+    const loadGridK = gpu.createKernel(loadGridKFn)
+    .setOutput([config.sizeX, config.sizeY])
+    .setOutputToTexture(true)
 
     const tickKFn = function(grid) {
       var sum = 0;
@@ -48,7 +50,8 @@ const GOL = (function(){
         sizeX: config.sizeX,
         sizeY: config.sizeY,
       },
-      output: [config.sizeX, config.sizeY]
+      output: [config.sizeX, config.sizeY],
+      outputToTexture: true
     });
 
     const renderKFn = function(grid) {
@@ -61,16 +64,23 @@ const GOL = (function(){
         );
     };
 
-      const renderK = gpu.createKernel(renderKFn)
-        .setOutput([config.sizeX, config.sizeY])
-        .setGraphical(true);
+    const renderK = gpu.createKernel(renderKFn)
+      .setOutput([config.sizeX, config.sizeY])
+      .setGraphical(true);
 
-      const initAndRenderK = gpu.combineKernels(loadGridK, tickK, renderK, function(a) {
-  	     return renderK(tickK(loadGridK(a)));
-      });
+    // const initAndRenderK = gpu.combineKernels(loadGridK, tickK, renderK, function(a) {
+	  //    return renderK(tickK(loadGridK(a)));
+    // });
 
     const randomArray = initRandomArray(config.sizeX, config.sizeY);
-    initAndRenderK( randomArray );
+    const initGridT = loadGridK( randomArray );
+    const nextGridT = tickK( initGridT );
+    renderK( nextGridT );
+
+
+
+    // initAndRenderK( randomArray );
+
     // const loadGridOutput = loadGrid(randomArray);
     // console.log(`loadGridOutput: ${JSON.stringify(loadGridOutput, null, 2)}`);
     // const tickOutput = tick( randomArray );
