@@ -5,6 +5,7 @@
   <meta charset="utf-8">
   <title>GPU.js Experiment</title>
   <script src="includes/vendor/gpu.js"></script>
+  <script src="includes/simplePattern.js"></script>
   <script src="includes/gameOfLife.js"></script>
   <link rel="stylesheet" type="text/css" href="includes/basic.css">
 </head>
@@ -17,7 +18,7 @@
 
   <script>
   (function(){
-    GOL.create({
+    SIMPLEPATTERN.create({
       gpu : new GPU({ canvas : document.getElementById('myCanvas') }),
       sizeX : 300,
       sizeY : 300,
