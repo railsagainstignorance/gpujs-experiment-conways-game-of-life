@@ -21,6 +21,30 @@ const GOL = (function(){
       return a;
     }
 
+    function initEmptyArray(maxX,maxY){
+      const a = [];
+      for (var y = 0; y < maxY; y++) {
+        a.push([]);
+        for (var x = 0; x < maxX; x++) {
+          a[y].push(0);
+        }
+      }
+      return a;
+    }
+
+    function initPatternArray(maxX,maxY, pattern){
+      const a = initEmptyArray(maxX,maxY);
+      const centreX = parseInt(maxX/2);
+      const centreY = parseInt(maxY/2);
+
+      pattern.map( function(row, dy){
+        row.map( function(cell, dx){
+          a[centreY+dy][centreX+dx] = cell;
+        });
+      });
+      return a;
+    }
+
     const loadGridKFn = function(a) {
         return a[this.thread.x][this.thread.y];
     }
@@ -40,8 +64,12 @@ const GOL = (function(){
           sum = sum + grid[nhrX][nhrY];
         }
       }
+
+      const cell = grid[this.thread.x][this.thread.y];
+      sum = sum - cell; // because this cell has been counted in the nhr for loops
+
       var outputCell;
-      if( (sum == 3) || ((sum == 2) && (grid[this.thread.x][this.thread.y] == 1) ) ) {
+      if( (sum === 3) || ((sum === 2) && (cell === 1) ) ) {
         outputCell = 1;
       } else {
         outputCell = 0;
@@ -50,6 +78,19 @@ const GOL = (function(){
     }
 
     const tickKt = gpu.createKernel(tickKFn, {
+      constants: {
+        sizeX: config.sizeX,
+        sizeY: config.sizeY,
+      },
+      output: [config.sizeX, config.sizeY],
+      outputToTexture: true
+    });
+
+    const cloneGridKFn = function(a) {
+        return a[this.thread.x][this.thread.y];
+    }
+
+    const cloneGridKt = gpu.createKernel(cloneGridKFn, {
       constants: {
         sizeX: config.sizeX,
         sizeY: config.sizeY,
@@ -72,13 +113,28 @@ const GOL = (function(){
       .setOutput([config.sizeX, config.sizeY])
       .setGraphical(true);
 
-    const randomArray = initRandomArray(config.sizeX, config.sizeY);
-    var gridT = loadGridKt( randomArray );
+    // const initialArray = initRandomArray(config.sizeX, config.sizeY);
+
+    const initialArray = initPatternArray(config.sizeX, config.sizeY, [
+      [0,1,1],
+      [1,1,0],
+      [0,1,0],
+    ])
+
+    // const initialArray = initPatternArray(config.sizeX, config.sizeY, [
+    //   [0,1,0],
+    //   [0,1,0],
+    //   [0,1,0],
+    // ])
+
+    // console.log(`initialArray=${JSON.stringify(initialArray, null, 2)}`);
+    var gridT = loadGridKt( initialArray );
 
     const maxTicks = 1000;
     var numTicks = 0;
     function animateTick(){
-      gridT = tickKt( gridT );
+      const tempGridT = tickKt( gridT );
+      gridT = cloneGridKt( tempGridT );
       renderK( gridT );
        if (numTicks < maxTicks) {
          numTicks += 1;
