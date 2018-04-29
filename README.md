@@ -51,6 +51,6 @@ My 'learnings' may also be misunderstandings. Caveat Emptor.
 * Given that the pipelining thing works, and you can sequence the kernel calls in normal JS whilst keeping the data in the GPU as textures, it is not clear why you would need to use the combineKernels and createKernelMap options?
 * Not clear what happens in the kernel if this.thread.x goes out of bounds of the input array? Not good, probably.
 
-### implementing Conway's Game of Game Of Life
+### implementing Conway's Game Of Life
 
 * Only an idiot would include the central cell in the count of neighbours, right?
