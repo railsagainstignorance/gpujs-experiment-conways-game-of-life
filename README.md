@@ -16,6 +16,8 @@ The default impl is of Conway's Game of Life, but you can switch over to the ear
 GOL.create({
 ```
 
+In this Game of Life impl, each iteration of the cellular automata grid is called a subTick, and there are several subTicks per tick. The grid is only rendered once per tick.
+
 ## context
 
 Starting with http://gpu.rocks/, which purports to make is easier to write normal-ish javascript that maps cleanly to the GPU and hence runs significantly faster than if it stayed on the CPU.
@@ -54,6 +56,7 @@ My 'learnings' may also be misunderstandings. Caveat Emptor.
 * No idea if/how you can specify multiple canvas instances in the same gpu instance?
 * Given that the pipelining thing works, and you can sequence the kernel calls in normal JS whilst keeping the data in the GPU as textures, it is not clear why you would need to use the combineKernels and createKernelMap options?
 * Not clear what happens in the kernel if this.thread.x goes out of bounds of the input array? Not good, probably.
+* Have attempted to measure the cumulative pauses in waiting for `window.requestAnimationFrame`, to compare with the duration of the GPU processing, which can be seen in the console.log output, but the numbers seems out of kilter. 
 
 ### implementing Conway's Game Of Life
 

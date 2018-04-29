@@ -53,7 +53,7 @@ const GOL = (function(){
     .setOutput([config.sizeX, config.sizeY])
     .setOutputToTexture(true)
 
-    const tickKFn = function(grid) {
+    const subTickKFn = function(grid) {
       var sum = 0;
       for (var dx = -1; dx < 2; dx++) {
         for (var dy = -1; dy < 2; dy++) {
@@ -77,7 +77,7 @@ const GOL = (function(){
       return outputCell;
     }
 
-    const tickKt = gpu.createKernel(tickKFn, {
+    const subTickKt = gpu.createKernel(subTickKFn, {
       constants: {
         sizeX: config.sizeX,
         sizeY: config.sizeY,
@@ -126,25 +126,46 @@ const GOL = (function(){
     var fromMillis = Date.now();
     const maxTicks = 1000;
     const everyFewTicks = 100;
+    const maxSubTicks = 13; // multiple of glider period (i.e. 4) + 1
     var numTicks = 0;
-    function animateTick(){
-      const tempGridT = tickKt( gridT );
-      gridT = cloneGridKt( tempGridT );
-      renderK( gridT );
-       if (numTicks < maxTicks) {
-         numTicks += 1;
-         if (numTicks % everyFewTicks == 0) {
-           const nowMillis = Date.now();
-           const durationNillis = nowMillis - fromMillis;
-           const tickRate = 1000 * everyFewTicks / durationNillis;
-           fromMillis = nowMillis;
-           console.log(`numTicks=${numTicks}, durationNillis=${durationNillis}, tickRate=${tickRate}`);
-         }
-         window.requestAnimationFrame(animateTick);
-       }
-     }
+    var sumRafDelaysMillis = 0;
+    var fromRafMillis = fromMillis;
+    var sumSubTicksMillis = 0;
+    var sumRenderMillis = 0;
 
-     window.requestAnimationFrame(animateTick);
+    function animateTick(){
+      const animateTickStartMillis = Date.now();
+      sumRafDelaysMillis += (animateTickStartMillis - fromRafMillis);
+      var subTicks = 0;
+      while( subTicks < maxSubTicks ){
+        const tempGridT = subTickKt( gridT );
+        gridT = cloneGridKt( tempGridT );
+        subTicks++;
+      }
+      const subTicksEndMillis = Date.now();
+      sumSubTicksMillis += (subTicksEndMillis - animateTickStartMillis);
+      renderK( gridT );
+      sumRenderMillis += (Date.now() - subTicksEndMillis);
+      if (numTicks < maxTicks) {
+        numTicks += 1;
+        if (numTicks % everyFewTicks == 0) {
+          const nowMillis = Date.now();
+          const durationMillis = nowMillis - fromMillis;
+          const tickRate = 1000 * everyFewTicks / durationMillis;
+          const subTickRate = tickRate * maxSubTicks;
+          console.log(`numTicks=${numTicks}, durationMillis=${durationMillis} (of which, RAF=${sumRafDelaysMillis}, subTicks=${sumSubTicksMillis}, render=${sumRenderMillis}), tickRate=${tickRate}, subTickRate=${subTickRate}`);
+          fromMillis = nowMillis;
+          sumRafDelaysMillis = 0;
+          sumSubTicksMillis = 0;
+          sumRenderMillis = 0;
+        }
+
+        fromRafMillis = Date.now();
+        window.requestAnimationFrame(animateTick);
+      }
+    }
+
+    window.requestAnimationFrame(animateTick);
   }
 
 return {
