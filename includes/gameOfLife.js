@@ -12,7 +12,7 @@ const GOL = (function(){
         this.color(
           (a[this.thread.x][this.thread.y] % 100)/100,
           (a[this.thread.x][this.thread.y] % 100)/100,
-          ((a[this.thread.x][this.thread.y] * a[this.thread.x][this.thread.y]) % 100)/100,
+          (((this.thread.x+this.thread.y)/3) % 100)/100,
           1
         );
     })
