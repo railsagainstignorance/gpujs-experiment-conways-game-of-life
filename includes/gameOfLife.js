@@ -121,16 +121,11 @@ const GOL = (function(){
       [0,1,0],
     ])
 
-    // const initialArray = initPatternArray(config.sizeX, config.sizeY, [
-    //   [0,1,0],
-    //   [0,1,0],
-    //   [0,1,0],
-    // ])
-
-    // console.log(`initialArray=${JSON.stringify(initialArray, null, 2)}`);
     var gridT = loadGridKt( initialArray );
 
+    var fromMillis = Date.now();
     const maxTicks = 1000;
+    const everyFewTicks = 100;
     var numTicks = 0;
     function animateTick(){
       const tempGridT = tickKt( gridT );
@@ -138,8 +133,12 @@ const GOL = (function(){
       renderK( gridT );
        if (numTicks < maxTicks) {
          numTicks += 1;
-         if (numTicks % 100 == 0) {
-           console.log(`numTicks=${numTicks}`);
+         if (numTicks % everyFewTicks == 0) {
+           const nowMillis = Date.now();
+           const durationNillis = nowMillis - fromMillis;
+           const tickRate = 1000 * everyFewTicks / durationNillis;
+           fromMillis = nowMillis;
+           console.log(`numTicks=${numTicks}, durationNillis=${durationNillis}, tickRate=${tickRate}`);
          }
          window.requestAnimationFrame(animateTick);
        }
