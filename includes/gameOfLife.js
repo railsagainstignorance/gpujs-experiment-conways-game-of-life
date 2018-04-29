@@ -1,5 +1,10 @@
 const GOL = (function(){
 
+  // naming convention:
+  // - *KFn => the function def which will be used to create a kernel
+  // - *K   => the kernel derived from the fn *KFn
+  // - *T   => a var with the value from the pipelining feature which keeps the kernel output in the GPU as a texture
+
   function create( config ){
     const gpu = config.gpu;
 
@@ -14,8 +19,6 @@ const GOL = (function(){
       }
       return a;
     }
-
-    // console.log(`initRandomArray: ${JSON.stringify(initRandomArray(10,10), null, 2)}`);
 
     const loadGridKFn = function(a) {
         return a[this.thread.x][this.thread.y];
@@ -68,36 +71,24 @@ const GOL = (function(){
       .setOutput([config.sizeX, config.sizeY])
       .setGraphical(true);
 
-    // const initAndRenderK = gpu.combineKernels(loadGridK, tickK, renderK, function(a) {
-	  //    return renderK(tickK(loadGridK(a)));
-    // });
-
     const randomArray = initRandomArray(config.sizeX, config.sizeY);
-    const initGridT = loadGridK( randomArray );
-    const nextGridT = tickK( initGridT );
-    renderK( nextGridT );
+    var gridT = loadGridK( randomArray );
 
+    const maxTicks = 1000;
+    var numTicks = 0;
+    function animateTick(){
+      gridT = tickK( gridT );
+      renderK( gridT );
+       if (numTicks < maxTicks) {
+         numTicks += 1;
+         if (numTicks % 100 == 0) {
+           console.log(`numTicks=${numTicks}`);
+         }
+         window.requestAnimationFrame(animateTick);
+       }
+     }
 
-
-    // initAndRenderK( randomArray );
-
-    // const loadGridOutput = loadGrid(randomArray);
-    // console.log(`loadGridOutput: ${JSON.stringify(loadGridOutput, null, 2)}`);
-    // const tickOutput = tick( randomArray );
-    // console.log(`tickOutput: ${JSON.stringify(tickOutput, null, 2)}`);
-    // const renderOutput = render( randomArray );
-    // console.log(`renderOutput: ${JSON.stringify(renderOutput, null, 2)}`);
-
-    // var offset=5;
-    // const maxOffset = 200;
-    // function animateOffsets(){
-    //    initAndRender(offset);
-    //    if (offset < maxOffset) {
-    //      offset += 1;
-    //      window.requestAnimationFrame(animateOffsets);
-    //    }
-    //  }
-    //  window.requestAnimationFrame(animateOffsets);
+     window.requestAnimationFrame(animateTick);
   }
 
 return {
