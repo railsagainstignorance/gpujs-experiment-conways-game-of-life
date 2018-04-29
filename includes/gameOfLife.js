@@ -1,9 +1,10 @@
 const GOL = (function(){
 
   // naming convention:
-  // - *KFn => the function def which will be used to create a kernel
-  // - *K   => the kernel derived from the fn *KFn
-  // - *T   => a var with the value from the pipelining feature which keeps the kernel output in the GPU as a texture
+  // - <verb>KFn => the function def which will be used to create a kernel
+  // - <verb>K   => the kernel derived from the fn *KFn
+  // - <verb>Kt  => the kernel derived from the fn *KFn, pipelining output to a texture (keeping data in GPU)
+  // - <name>T   => a var referencin pipelined output
 
   function create( config ){
     const gpu = config.gpu;
@@ -24,7 +25,7 @@ const GOL = (function(){
         return a[this.thread.x][this.thread.y];
     }
 
-    const loadGridK = gpu.createKernel(loadGridKFn)
+    const loadGridKt = gpu.createKernel(loadGridKFn)
     .setOutput([config.sizeX, config.sizeY])
     .setOutputToTexture(true)
 
@@ -48,7 +49,7 @@ const GOL = (function(){
       return outputCell;
     }
 
-    const tickK = gpu.createKernel(tickKFn, {
+    const tickKt = gpu.createKernel(tickKFn, {
       constants: {
         sizeX: config.sizeX,
         sizeY: config.sizeY,
@@ -72,12 +73,12 @@ const GOL = (function(){
       .setGraphical(true);
 
     const randomArray = initRandomArray(config.sizeX, config.sizeY);
-    var gridT = loadGridK( randomArray );
+    var gridT = loadGridKt( randomArray );
 
     const maxTicks = 1000;
     var numTicks = 0;
     function animateTick(){
-      gridT = tickK( gridT );
+      gridT = tickKt( gridT );
       renderK( gridT );
        if (numTicks < maxTicks) {
          numTicks += 1;

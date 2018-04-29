@@ -13,15 +13,15 @@
   <h1>GPU.js Experiment</h1>
 
   <div id="canvas-holder">
-    <canvas class="blotting-paper" id="myCanvas" width="300" height="300"></canvas>
+    <canvas class="blotting-paper" id="myCanvas" width="1000" height="1000"></canvas>
   </div>
 
   <script>
   (function(){
     GOL.create({
       gpu : new GPU({ canvas : document.getElementById('myCanvas') }),
-      sizeX : 300,
-      sizeY : 300,
+      sizeX : 400,
+      sizeY : 400,
     });
   })();
   </script>
