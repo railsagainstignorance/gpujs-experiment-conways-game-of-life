@@ -28,11 +28,11 @@ My 'learnings' may also be misunderstandings. Caveat Emptor.
 
 * worth noting for a kernel which outputs to a canvas, specified by `.setGraphical(true)`
    * does not return anything useful from the call to the kernel (see the docs)
+   * when using `this.color(R,G,B,A)`, the RGBA values are floats in the range 0-1.
    * can create its own canvas element by default, or be given one via the initialisation of the gpu object
 ```javascript
      var gpu = new GPU({ canvas : document.getElementById('myCanvas') });
 ```
-   * when using `this.color(R,G,B,A)`, the RGBA values are floats in the range 0-1.
 * you can only use a function instance once in a kernel. This is not an issue if you create anonymous functions dynamically in the kernel creation as per the docs, but if you assign a function instance to a variable, then use that value in two `gpu.createKernel` calls, it will complain.
 * when creating a kernel, your function can't refer to variables that were defined outside the scope of that function. If you want to use externally-set values, you pass them into the kernel via the `constants` attribute (see the docs).
 * by default, every invocation of a kernel involves porting the input array arguments from JS arrays into GPU-tastic datastructures (aka textures), running the kernel in the GPU to generate an GPU-specific output structure, then porting that structure back into normal JS, where you can then use it as per usual. This is fine if you only want to carry out one, isolated piece of heavy-duting processing on some data, but very inefficient if you want to iterate that. The key phrase to notice is *pipelining* (see the docs).
