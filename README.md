@@ -22,7 +22,9 @@ Starting with http://gpu.rocks/, which purports to make is easier to write norma
 
 ### using GPU.js
 
-The [documentation](https://github.com/gpujs/gpu.js#table-of-contents) is ok, but not great. It is a good starting point, but has lots of gaps. The error messages can be less than useful.
+The [documentation](https://github.com/gpujs/gpu.js#table-of-contents) is ok, but not great. It is a good starting point, but has lots of gaps.
+
+The error messages can be less than useful.
 
 My 'learnings' may also be misunderstandings. Caveat Emptor.
 
