@@ -17,11 +17,13 @@ const GOL = (function(){
 
     // console.log(`initRandomArray: ${JSON.stringify(initRandomArray(10,10), null, 2)}`);
 
-    const loadGrid = gpu.createKernel(function(a) {
+    const loadGridKFn = function(a) {
         return a[this.thread.x][this.thread.y];
-    }).setOutput([config.sizeX, config.sizeY])
+    }
 
-    const tick = gpu.createKernel(function(grid) {
+    const loadGridK = gpu.createKernel(loadGridKFn).setOutput([config.sizeX, config.sizeY])
+
+    const tickKFn = function(grid) {
       var sum = 0;
       for (var dx = -1; dx < 2; dx++) {
         for (var dy = -1; dy < 2; dy++) {
@@ -39,7 +41,9 @@ const GOL = (function(){
         outputCell = 0;
       }
       return outputCell;
-    }, {
+    }
+
+    const tickK = gpu.createKernel(tickKFn, {
       constants: {
         sizeX: config.sizeX,
         sizeY: config.sizeY,
@@ -47,7 +51,7 @@ const GOL = (function(){
       output: [config.sizeX, config.sizeY]
     });
 
-    const render = gpu.createKernel(function(grid) {
+    const renderKFn = function(grid) {
         // this.color( 0-1, 0-1, 0-1, 1)
         this.color(
           grid[this.thread.x][this.thread.y] * 100,
@@ -55,18 +59,18 @@ const GOL = (function(){
           grid[this.thread.x][this.thread.y] * 100,
           1
         );
-    })
-      .setOutput([config.sizeX, config.sizeY])
-      .setGraphical(true);
+    };
 
-      const initAndRender = gpu.combineKernels(loadGrid, tick, render, function(a) {
-  	     return render(tick(loadGrid(a)));
+      const renderK = gpu.createKernel(renderKFn)
+        .setOutput([config.sizeX, config.sizeY])
+        .setGraphical(true);
+
+      const initAndRenderK = gpu.combineKernels(loadGridK, tickK, renderK, function(a) {
+  	     return renderK(tickK(loadGridK(a)));
       });
 
-
-
     const randomArray = initRandomArray(config.sizeX, config.sizeY);
-    initAndRender( randomArray );
+    initAndRenderK( randomArray );
     // const loadGridOutput = loadGrid(randomArray);
     // console.log(`loadGridOutput: ${JSON.stringify(loadGridOutput, null, 2)}`);
     // const tickOutput = tick( randomArray );
