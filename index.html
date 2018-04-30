@@ -7,6 +7,7 @@
   <script src="includes/vendor/gpu.js"></script>
   <script src="includes/simplePattern.js"></script>
   <script src="includes/gameOfLife.js"></script>
+  <script src="includes/gameOfLifeManyKernels.js"></script>
   <link rel="stylesheet" type="text/css" href="includes/basic.css">
 </head>
 <body>
@@ -25,7 +26,8 @@
   <script>
   (function(){
     // SIMPLEPATTERN.create({
-    GOL.create({
+    // GOL.create({
+    GOLMK.create({
       gpu : new GPU({ canvas : document.getElementById('myCanvas') }),
       sizeX : 400,
       sizeY : 400,
