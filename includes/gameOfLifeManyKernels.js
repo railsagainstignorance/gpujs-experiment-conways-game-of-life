@@ -49,7 +49,154 @@ const GOLMK = (function(){
         return a[this.thread.x][this.thread.y];
     })
     .setOutput([config.sizeX, config.sizeY])
-    .setOutputToTexture(true)
+    .setOutputToTexture(true);
+
+    // y 234
+    // ^ 1C5
+    // | 076
+    //  -->x
+    //
+    // spread out the one subTickKt kernel into 8+1 sub kernels to each do a piece of the original kernel
+
+    const subTick0Kt = gpu.createKernel(function(grid) {
+      var sum = 0;
+      if (this.thread.x>0 && this.thread.y>0) {
+        sum += grid[this.thread.x-1][this.thread.y-1];
+      }
+      return sum;
+    }, {
+      constants: {
+        sizeX: config.sizeX,
+        sizeY: config.sizeY,
+      },
+      output: [config.sizeX, config.sizeY],
+      outputToTexture: true
+    });
+
+    const subTick1Kt = gpu.createKernel(function(grid, runningTotals) {
+      var sum = runningTotals[this.thread.x][this.thread.y];
+      if (this.thread.x>0) {
+        sum += grid[this.thread.x-1][this.thread.y];
+      }
+      return sum;
+    }, {
+      constants: {
+        sizeX: config.sizeX,
+        sizeY: config.sizeY,
+      },
+      output: [config.sizeX, config.sizeY],
+      outputToTexture: true
+    });
+
+    const subTick2Kt = gpu.createKernel(function(grid, runningTotals) {
+      var sum = runningTotals[this.thread.x][this.thread.y];
+      if (this.thread.x>0 && this.thread.y < (this.constants.sizeY-1)) {
+        sum += grid[this.thread.x-1][this.thread.y+1];
+      }
+      return sum;
+    }, {
+      constants: {
+        sizeX: config.sizeX,
+        sizeY: config.sizeY,
+      },
+      output: [config.sizeX, config.sizeY],
+      outputToTexture: true
+    });
+
+    const subTick3Kt = gpu.createKernel(function(grid, runningTotals) {
+      var sum = runningTotals[this.thread.x][this.thread.y];
+      if (this.thread.y < (this.constants.sizeY-1)) {
+        sum += grid[this.thread.x][this.thread.y+1];
+      }
+      return sum;
+    }, {
+      constants: {
+        sizeX: config.sizeX,
+        sizeY: config.sizeY,
+      },
+      output: [config.sizeX, config.sizeY],
+      outputToTexture: true
+    });
+
+    const subTick4Kt = gpu.createKernel(function(grid, runningTotals) {
+      var sum = runningTotals[this.thread.x][this.thread.y];
+      if (this.thread.x < (this.constants.sizeX-1) && this.thread.y < (this.constants.sizeY-1)) {
+        sum += grid[this.thread.x+1][this.thread.y+1];
+      }
+      return sum;
+    }, {
+      constants: {
+        sizeX: config.sizeX,
+        sizeY: config.sizeY,
+      },
+      output: [config.sizeX, config.sizeY],
+      outputToTexture: true
+    });
+
+    const subTick5Kt = gpu.createKernel(function(grid, runningTotals) {
+      var sum = runningTotals[this.thread.x][this.thread.y];
+      if (this.thread.x < (this.constants.sizeX-1)) {
+        sum += grid[this.thread.x+1][this.thread.y];
+      }
+      return sum;
+    }, {
+      constants: {
+        sizeX: config.sizeX,
+        sizeY: config.sizeY,
+      },
+      output: [config.sizeX, config.sizeY],
+      outputToTexture: true
+    });
+
+    const subTick6Kt = gpu.createKernel(function(grid, runningTotals) {
+      var sum = runningTotals[this.thread.x][this.thread.y];
+      if (this.thread.x < (this.constants.sizeX-1) && this.thread.y>0) {
+        sum += grid[this.thread.x+1][this.thread.y-1];
+      }
+      return sum;
+    }, {
+      constants: {
+        sizeX: config.sizeX,
+        sizeY: config.sizeY,
+      },
+      output: [config.sizeX, config.sizeY],
+      outputToTexture: true
+    });
+
+    const subTick7Kt = gpu.createKernel(function(grid, runningTotals) {
+      var sum = runningTotals[this.thread.x][this.thread.y];
+      if (this.thread.y>0) {
+        sum += grid[this.thread.x][this.thread.y-1];
+      }
+      return sum;
+    }, {
+      constants: {
+        sizeX: config.sizeX,
+        sizeY: config.sizeY,
+      },
+      output: [config.sizeX, config.sizeY],
+      outputToTexture: true
+    });
+
+    const subTickLiveDieKt = gpu.createKernel(function(grid, runningTotals) {
+      var sum = runningTotals[this.thread.x][this.thread.y];
+      const cell = grid[this.thread.x][this.thread.y];
+
+      var outputCell;
+      if( (sum === 3) || ((sum === 2) && (cell === 1) ) ) {
+        outputCell = 1;
+      } else {
+        outputCell = 0;
+      }
+      return outputCell;
+    }, {
+      constants: {
+        sizeX: config.sizeX,
+        sizeY: config.sizeY,
+      },
+      output: [config.sizeX, config.sizeY],
+      outputToTexture: true
+    });
 
     const subTickKt = gpu.createKernel(function(grid) {
       var sum = 0;
@@ -139,6 +286,15 @@ const GOLMK = (function(){
       var subTicks = 0;
       while( subTicks < maxSubTicks ){
         const tempGridT = subTickKt( gridT );
+        // const tempGridT = subTickLiveDieKt(gridT,
+        //                     subTick7Kt(gridT,
+        //                       subTick6Kt(gridT,
+        //                         subTick5Kt(gridT,
+        //                           subTick4Kt(gridT,
+        //                             subTick3Kt(gridT,
+        //                               subTick2Kt(gridT,
+        //                                 subTick1Kt(gridT,
+        //                                   subTick0Kt(gridT) ) ) ) ) ) ) ) );
         gridT = cloneGridKt( tempGridT );
         subTicks++;
       }
