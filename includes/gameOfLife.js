@@ -160,11 +160,11 @@ const GOL = (function(){
           const durationMillis = nowMillis - fromMillis;
           const tickRate = 1000 * everyFewTicks / durationMillis;
           const subTickRate = tickRate * maxSubTicks;
-          commentaryEntries.push(`numTicks=${numTicks}, durationMillis=${durationMillis} (of which, RAF=${sumRafDelaysMillis}, subTicks=${sumSubTicksMillis}, render=${sumRenderMillis}), frameRate=${parseFloat(tickRate).toFixed(1)}, subTickRate=${parseFloat(subTickRate).toFixed(1)}, subTicksPerFrame=${maxSubTicks}`);
-          const commentary = commentaryEntries.slice(0).reverse().join("\n<br>")
+          commentaryEntries.unshift(`numTicks=${numTicks}, durationMillis=${durationMillis} (of which, RAF=${sumRafDelaysMillis}, subTicks=${sumSubTicksMillis}, render=${sumRenderMillis}), frameRate=${parseFloat(tickRate).toFixed(1)}, subTickRate=${parseFloat(subTickRate).toFixed(1)}, subTicksPerFrame=${maxSubTicks}`);
+          const commentary = commentaryEntries.join("\n<br>");
           console.log(commentary);
-          if (config.hasOwnProperty( 'writeRunningComentaryInnerHTML')) {
-            config.writeRunningComentaryInnerHTML( commentary );
+          if (config.hasOwnProperty( 'writeRunningCommentaryInnerHTML')) {
+            config.writeRunningCommentaryInnerHTML( commentary );
           }
           fromMillis = nowMillis;
           sumRafDelaysMillis = 0;
